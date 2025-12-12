@@ -22,8 +22,20 @@
             <trans-unit id="extconf.api_base_uri" resname="extconf.project_id">
                 <source>Alternative API Endpoint. If not set openAI is used</source>
             </trans-unit>
-            <trans-unit id="extconf.model" resname="extconf.project_id">
+            <trans-unit id="extconf.model" resname="extconf.model">
                 <source>Selected model, default gpt-4o-mini</source>
+            </trans-unit>
+            <trans-unit id="extconf.provider" resname="extconf.provider">
+                <source>AI Provider</source>
+            </trans-unit>
+            <trans-unit id="extconf.gemini_api_key" resname="extconf.gemini_api_key">
+                <source>Gemini API Key</source>
+            </trans-unit>
+            <trans-unit id="extconf.claude_api_key" resname="extconf.claude_api_key">
+                <source>Claude API Key</source>
+            </trans-unit>
+            <trans-unit id="extconf.openrouter_api_key" resname="extconf.openrouter_api_key">
+                <source>OpenRouter API Key</source>
             </trans-unit>
         </body>
     </file>

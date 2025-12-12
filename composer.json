@@ -24,11 +24,12 @@
     "php": ">=8.2",
     "ext-intl": "*",
     "openai-php/client": "^v0.10.1",
+    "cheinisch/openrouter-php-client": "^0.2.2",
     "typo3/cms-core": "^12 || ^13"
   },
-  "suggest": {
-    "mfc/picturecredits": "*",
-    "typo3/cms-filemetadata" : "*"
+  "require-dev": {
+    "typo3/tailor": "^1.6",
+    "clue/phar-composer": "*"
   },
   "replace": {
     "typo3-ter/ai-filemetadata": "*"
@@ -43,10 +44,12 @@
       "Mfd\\Ai\\FileMetadata\\": "Classes/"
     }
   },
-  "require-dev": {
-    "typo3/tailor": "^1.6",
-    "clue/phar-composer": "*"
-  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/cheinisch/OpenRouter-php-Client.git"
+    }
+  ],
   "config": {
     "allow-plugins": {
       "php-http/discovery": true,

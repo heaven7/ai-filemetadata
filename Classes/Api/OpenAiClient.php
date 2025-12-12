@@ -5,29 +5,48 @@ namespace Mfd\Ai\FileMetadata\Api;
 use OpenAI;
 use OpenAI\Client as OpenAiApiClient;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
-readonly class OpenAiClient
+readonly class OpenAiClient implements AiClientInterface
 {
+    protected const DEFAULT_MODEL = 'gpt-4-turbo';
+    
     private OpenAiApiClient $openAiClient;
+    private bool $available;
 
     public function __construct(
-        private ExtensionConfiguration $extensionConfiguration,
         private readonly LoggerInterface $logger,
+        string $apiKey,
+        string $organizationId,
+        string $projectId,
+        string $apiBaseUri,
+        private readonly string $model,
+        array $extraHeaders = []
     ) {
-        $apiKey = $this->extensionConfiguration->get('ai_filemetadata', 'apiKey');
-        $organizationId = $this->extensionConfiguration->get('ai_filemetadata', 'organizationId');
-        $projectId = $this->extensionConfiguration->get('ai_filemetadata', 'projectId');
-        $APIBaseUri = $this->extensionConfiguration->get('ai_filemetadata', 'apiBaseUri');
-        if ($APIBaseUri === '') {
-            $APIBaseUri = 'https://api.openai.com/v1/';
+        if ($apiBaseUri === '') {
+            $apiBaseUri = 'https://api.openai.com/v1/';
         }
-        $this->openAiClient = OpenAI::factory()
-            ->withBaseUri($APIBaseUri)
+        $builder = OpenAI::factory()
+            ->withBaseUri($apiBaseUri)
             ->withApiKey($apiKey)
             ->withOrganization($organizationId)
-            ->withHttpHeader('OpenAI-Project', $projectId)
-            ->make();
+            ->withHttpHeader('OpenAI-Project', $projectId);
+
+        foreach ($extraHeaders as $header => $value) {
+            $builder->withHttpHeader($header, $value);
+        }
+
+        $this->openAiClient = $builder->make();
+        $this->available = true;
+    }
+
+    public function getName(): string
+    {
+        return 'OpenAI';
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->available;
     }
 
     public function buildAltText(string $image, ?string $locale = null): string
@@ -46,7 +65,7 @@ GPT;
 
         $this->logger->info('Prompt: ' . $prompt);
 
-        $modell = $this->extensionConfiguration->get('ai_filemetadata', 'model');
+        $modell = $this->model;
         if ($modell === '') {
             $modell = 'gpt-4o-mini';
         }
@@ -71,13 +90,53 @@ GPT;
                 ],
             ],
         ]);
-
-        if ($response->usage !== [] && ($usage = $response->usage)) {
-            $this->logger->debug(print_r($usage, true));
+        
+        try {
+            if (property_exists($response, 'usage') && $response->usage !== null) {
+                $usageData = [
+                    'prompt_tokens' => $response->usage->promptTokens ?? 0,
+                    'completion_tokens' => $response->usage->completionTokens ?? 0,
+                    'total_tokens' => $response->usage->totalTokens ?? 0
+                ];
+                
+                try {
+                    // Safely handle tokens details which might not always be available
+                    if (property_exists($response->usage, 'promptTokensDetails') && $response->usage->promptTokensDetails !== null) {
+                        $usageData['prompt_details'] = [
+                            'cached_tokens' => $response->usage->promptTokensDetails->cachedTokens ?? 0,
+                            'audio_tokens' => $response->usage->promptTokensDetails->audioTokens ?? 0,
+                            'video_tokens' => $response->usage->promptTokensDetails->videoTokens ?? 0
+                        ];
+                    }
+                    
+                    if (property_exists($response->usage, 'completionTokensDetails') && $response->usage->completionTokensDetails !== null) {
+                        $usageData['completion_details'] = [
+                            'reasoning_tokens' => $response->usage->completionTokensDetails->reasoningTokens ?? 0,
+                            'image_tokens' => $response->usage->completionTokensDetails->imageTokens ?? 0
+                        ];
+                    }
+                } catch (\Throwable $e) {
+                    $this->logger->debug('Error processing token details: ' . $e->getMessage());
+                }
+                
+                $this->logger->debug('OpenAI Usage', $usageData);
+            }
+        } catch (\Exception $e) {
+            $this->logger->debug('Could not log OpenAI usage data: ' . $e->getMessage());
         }
-        if ($response->choices !== [] && ($choice = $response->choices[0])) {
+
+        if (!empty($response->choices) && ($choice = $response->choices[0])) {
             $this->logger->debug(print_r($choice, true));
-            return trim($choice->message->content,'"') ?? '';
+            $message_content = str_replace(['**Beschreibung:** ', '**Alt-Text:** ', '**Alternative Text:** ' ], '', $choice->message->content);
+
+            // Remove word count notes and similar remarks marked with *
+            $cleanContent = preg_replace(
+                '/\*\([^)]*\)\*/',
+                '',
+                $message_content
+            );
+
+            return trim($cleanContent,'"') ?? '';
         }
 
 

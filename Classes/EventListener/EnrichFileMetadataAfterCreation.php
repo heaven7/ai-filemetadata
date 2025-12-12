@@ -2,7 +2,8 @@
 
 namespace Mfd\Ai\FileMetadata\EventListener;
 
-use Mfd\Ai\FileMetadata\Api\OpenAiClient;
+use Mfd\Ai\FileMetadata\Api\AiClientInterface;
+use Mfd\Ai\FileMetadata\Services\AiClientFactory;
 use Mfd\Ai\FileMetadata\Services\ConfigurationService;
 use Mfd\Ai\FileMetadata\Services\FalAdapter;
 use Psr\Log\LoggerInterface;
@@ -17,7 +18,7 @@ class EnrichFileMetadataAfterCreation
     public function __construct(
         private ConnectionPool $connectionPool,
         private FileRepository $fileRepository,
-        private OpenAiClient $openAiClient,
+        private AiClientFactory $aiClientFactory,
         private SiteFinder $siteFinder,
         private ConfigurationService $configurationService,
         private LoggerInterface $logger,
@@ -64,7 +65,7 @@ class EnrichFileMetadataAfterCreation
 
         // During FAL upload we can safely assume that the current metadata record belongs to site language 0
         $locale = $languageMappings[0];
-        $alternative = $this->openAiClient->buildAltText(
+        $alternative = $this->aiClientFactory->buildAltText(
             $this->falAdapter->resizeImage($file)->getContents(),
             $locale
         );

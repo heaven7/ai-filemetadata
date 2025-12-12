@@ -26,7 +26,7 @@ your privacy and data protection policies if the usage of the services for the i
 
 * TYPO3 >= v12
 * PHP >= 8.2
-* OpenAI API key (_not to be confused with "ChatGPT Teams" or "ChatGPT Enterprise"_)
+* API keys for selected AI providers (OpenAI, Google Gemini, Anthropic Claude, OpenRouter)
 
 ## Installation
 
@@ -34,14 +34,23 @@ your privacy and data protection policies if the usage of the services for the i
 
 ## Configuration
 
-Acquire the [OpenAI API key from Open-AI](https://platform.openai.com/docs/quickstart) and place the key in extension
-configuration. Model for openAI gpt-4o-mini but can be changed to any other modell which supports imageprocessing.
+### Provider and API Keys
+Configure the AI provider and corresponding API keys in the TYPO3 backend under **Extension Configuration > ai_filemetadata**.
+
+- **Provider**: Select from OpenAI, Google Gemini, Anthropic Claude, or OpenRouter.
+- **API Keys**: Enter the appropriate API key for your selected provider.
+  - **OpenAI**: Obtain from [OpenAI](https://platform.openai.com/docs/quickstart)
+  - **Google Gemini**: Obtain from [Google AI Studio](https://ai.google.dev/)
+  - **Anthropic Claude**: Obtain from [Anthropic](https://www.anthropic.com/)
+  - **OpenRouter**: Obtain from [OpenRouter](https://openrouter.ai/)
+- **Models**: Each provider has a default model configured. You can override the model for each provider if supported.
 
 Alternatively [setup AI hosting in the mittwald cloud and add the AI Base URL (API) to the configuration and select
 an active modell](https://www.marketing-factory.com/blog/using-our-typo3-extension-ai-filemetadata-with-mittwalds-ai-hosting/)
 
-### Language Mapping
+### Advanced Settings
 
+#### Language Mapping
 Since folder do not have a relation to any of the sites default languages you might want to define a mapping for certain folders of your storages. You can do so by add this to your `system/settings.php`:
 
 ```php
@@ -58,8 +67,7 @@ Since folder do not have a relation to any of the sites default languages you mi
 
 This defines the locales being used for each `sys_language_uid` per folder.
 
-### Exclude folders
-
+#### Exclude folders
 To exclude certain folders you can use this in your `system/settings.php`:
 
 ```php
@@ -72,8 +80,7 @@ To exclude certain folders you can use this in your `system/settings.php`:
     ],
 ```
 
-### Resize images for LLM processing
-
+#### Resize images for LLM processing
 Sending large images to OpenAI language models can consume an extremely large number of tokens leading to higher costs, see https://platform.openai.com/docs/guides/images-vision?api-mode=chat#calculating-costs.
 In most cases, an image size of no more than 512x512px is perfectly adequate for image analysis.
 

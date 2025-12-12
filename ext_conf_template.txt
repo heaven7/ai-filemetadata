@@ -1,3 +1,6 @@
+# cat=General; type=options[OpenAI=openai,Gemini=gemini,Claude=claude,OpenRouter=openrouter]; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.provider
+provider = openai
+
 # cat=OpenAI; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.api_key
 apiKey =
 
@@ -10,7 +13,28 @@ projectId =
 # cat=OpenAI; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.api_base_uri
 apiBaseUri = https://api.openai.com/v1
 
-# cat=OpenAI; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.model
+# cat=OpenAI; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.openai_model
+openai_model = gpt-4o-mini
+
+# cat=Gemini; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.gemini_api_key
+geminiApiKey =
+
+# cat=Gemini; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.gemini_model
+gemini_model = gemini-1.5-flash
+
+# cat=Claude; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.claude_api_key
+claudeApiKey =
+
+# cat=Claude; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.claude_model
+claude_model = claude-3-5-sonnet-20240620
+
+# cat=OpenRouter; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.openrouter_api_key
+openRouterApiKey =
+
+# cat=OpenRouter; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.openrouter_model
+openrouter_model = gpt-4o-mini
+
+# cat=General; type=string; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.model
 model = gpt-4o-mini
 
 # cat=OpenAI; type=options[Disable=0,Shrink to fit 256x256px=256,Shrink to fit 512x512px=512,Shrink to fit 1024x1024px=1024]; label=LLL:EXT:ai_filemetadata/Resources/Private/Language/locallang_be.xlf:extconf.image_resizing

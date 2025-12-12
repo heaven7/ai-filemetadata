@@ -6,12 +6,41 @@ services:
 
   Mfd\Ai\FileMetadata\:
     resource: '../Classes/'
+    exclude: '../Classes/Api/AiClientInterface.php'
 
   Mfd\Ai\FileMetadata\Command\GenerateAltTextsCommand:
+    arguments:
+      $falAdapter: '@Mfd\Ai\FileMetadata\Services\FalAdapter'
     tags:
       - name: console.command
         command: ai:generate-alt-texts
+
   Mfd\Ai\FileMetadata\EventListener\EnrichFileMetadataAfterCreation:
+    arguments:
+      $aiClientFactory: '@Mfd\Ai\FileMetadata\Services\AiClientFactory'
+      $falAdapter: '@Mfd\Ai\FileMetadata\Services\FalAdapter'
     tags:
       - name: event.listener
+
+  Mfd\Ai\FileMetadata\Backend\Controller\AiGeneratedAltTextAjaxController:
+    arguments:
+      $aiClientFactory: '@Mfd\Ai\FileMetadata\Services\AiClientFactory'
+      $falAdapter: '@Mfd\Ai\FileMetadata\Services\FalAdapter'
+      $fileMetadataRepository: '@Mfd\Ai\FileMetadata\Domain\Repository\FileMetadataRepository'
+      $configurationService: '@Mfd\Ai\FileMetadata\Services\ConfigurationService'
+
+  Mfd\Ai\FileMetadata\Services\AiClientFactory: ~
+
+  Mfd\Ai\FileMetadata\Services\ConfigurationService: ~
+
+  Mfd\Ai\FileMetadata\Services\FalAdapter:
+    arguments:
+      $aiClientFactory: '@Mfd\Ai\FileMetadata\Services\AiClientFactory'
+      $configurationService: '@Mfd\Ai\FileMetadata\Services\ConfigurationService'
+
   Mfd\Ai\FileMetadata\Services\FalCursor: ~
+
+  Mfd\Ai\FileMetadata\Domain\Repository\FileMetadataRepository: ~
+
+  Mfd\Ai\FileMetadata\Api\AiClientInterface:
+    factory: ['@Mfd\Ai\FileMetadata\Services\AiClientFactory', 'createClient']

@@ -2,7 +2,8 @@
 
 namespace Mfd\Ai\FileMetadata\Services;
 
-use Mfd\Ai\FileMetadata\Api\OpenAiClient;
+use Mfd\Ai\FileMetadata\Api\AiClientInterface;
+use Mfd\Ai\FileMetadata\Services\AiClientFactory;
 use Mfd\Ai\FileMetadata\Event\ModifyUpdateArrayEvent;
 use Mfd\Ai\FileMetadata\Sites\SiteLanguageProvider;
 use Psr\Log\LoggerInterface;
@@ -27,7 +28,7 @@ class FalAdapter
     private array $siteLanguageMapping = [];
 
     public function __construct(
-        private readonly OpenAiClient $openAiClient,
+        private readonly AiClientFactory $aiClientFactory,
         private readonly ImageService $imageService,
         private readonly ConfigurationService $configurationService,
         private readonly SiteLanguageProvider $languageProvider,
@@ -180,7 +181,7 @@ class FalAdapter
             if (!$file->exists()) {
                 continue;
             }
-            $altText = $this->openAiClient->buildAltText(
+            $altText = $this->aiClientFactory->buildAltText(
                 $this->resizeImage($file)->getContents(),
                 $falLanguages[$sysLanguageUid]
             );
